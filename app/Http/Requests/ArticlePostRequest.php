@@ -27,7 +27,7 @@ class ArticlePostRequest extends FormRequest
             "stock" => "required|min:0",
             "category_id" => "required|exists:categories,id",
             "providers" => "required",
-            "reference" => "required|unique:articles",
+            "reference" => "required|unique:articles_confection",
             "order" => "required",
             "photo" => "image|max:2000"
         ];

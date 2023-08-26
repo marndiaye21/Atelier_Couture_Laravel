@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Category;
-use App\Models\Provider;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,14 +12,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('articles_confection', function (Blueprint $table) {
+        Schema::create('articles_vente', function (Blueprint $table) {
             $table->id();
             $table->string("label")->unique();
-            $table->integer("price", false, true);
-            $table->integer("stock", false, true);
-            $table->foreignIdFor(Category::class)->constrained()->cascadeOnDelete();
+            $table->float("sales_price");
+            $table->float("promo")->default(0);
+            $table->integer("stock")->default(0);
+            $table->string("photo");
             $table->string("reference");
-            $table->string("photo")->nullable();
+            $table->float("manufacturing_cost");
+            $table->float("marge");
+            $table->foreignIdFor(Category::class)->constrained();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -30,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('articles_confection');
+        Schema::dropIfExists('articles_vente');
     }
 };

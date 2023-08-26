@@ -27,7 +27,7 @@ class ArticlePutRequest extends FormRequest
             "stock" => "sometimes|required|min:0",
             "category_id" => "sometimes|required|exists:categories,id",
             "providers" => "sometimes|required",
-            "reference" => "sometimes|required|unique:articles",
+            "reference" => "sometimes|required|unique:articles_confection",
             "order" => "sometimes|required",
             "photo" => "image|max:2000"
         ];

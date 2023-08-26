@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('articles_confection', function (Blueprint $table) {
-            $table->softDeletes();
+        Schema::table('categories', function (Blueprint $table) {
+            $table->enum("type", ["confection", "vente"]);
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('articles_confection', function (Blueprint $table) {
-            $table->dropSoftDeletes();
+        Schema::table('categories', function (Blueprint $table) {
+            $table->dropColumn("type");
         });
     }
 };

@@ -19,8 +19,20 @@ class Category extends Model
         return $builder->where("label", $label);
     }
 
-    public function articles() : HasMany
+    public function scopeByType(Builder $builder, string $type) : Builder
     {
-        return $this->hasMany(Article::class);
+        return $builder->where("type", $type);
+    }
+
+    public function articlesConfection() : HasMany
+    {
+        return $this->hasMany(ArticleConfection::class, "category_id");
+    }
+
+    public static function booted()
+    {
+        static::deleted(function (Category $category) {
+            $category->articlesConfection()->delete();
+        });
     }
 }

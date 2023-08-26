@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\ArticleConfectionController;
+use App\Http\Controllers\ArticleVenteController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProviderController;
-use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,12 +23,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::apiResource("/categories", CategoryController::class);
-Route::get("/categories/search/{label}", [CategoryController::class, "search"]);
+Route::get("/categories/search/{searchValue}", [CategoryController::class, "search"]);
 Route::delete("/categories/delete", [CategoryController::class, "destroy"]);
 
 Route::apiResource("/providers", ProviderController::class);
 Route::get("/providers/search/{searchValue}", [ProviderController::class, "search"]);
 
-Route::apiResource("/articles", ArticleController::class);
-Route::get("/articles/search/{search_value}", [ArticleController::class, 'searchArticle']);
+Route::apiResource("/articles", ArticleConfectionController::class);
+Route::get("/articles/search/{searchValue}", [ArticleConfectionController::class, 'searchArticle']);
+
+Route::apiResource("/articles_vente", ArticleVenteController::class);
+
 

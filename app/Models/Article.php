@@ -16,34 +16,13 @@ class Article extends Model
 
     protected $guarded = [];
 
-    public function providers(): BelongsToMany
-    {
-        return $this->belongsToMany(Provider::class, 'approvisionnements', 'article_id', 'provider_id');
-    }
-
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class);
-    }
-
     public function scopeByLabel(Builder $builder, string $label): Builder
     {
         return $builder->where("label", $label);
     }
 
-    public static function afterCreated(Article $article, array $providers, int $order): void
+    public function category(): BelongsTo
     {
-        $article->providers()->attach($providers);
-        Category::where("id", $article->category_id)->first()->update(["order" => $order]);
-    }
-    
-    public static function afterUpdated(Article $article, array|null $providers, int|null $order): void
-    {
-        if ($providers) {
-            $article->providers()->sync($providers);
-        }
-        if ($order) {
-            Category::where("id", $article->category_id)->first()->update(["order" => $order]);
-        }
+        return $this->belongsTo(Category::class);
     }
 }

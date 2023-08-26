@@ -2,45 +2,49 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Article;
 use App\Models\Category;
 use App\Models\Provider;
 use App\Traits\FileUploaded;
 use Illuminate\Http\Request;
 use App\Models\Approvisionnement;
+use App\Models\ArticleConfection;
 use Illuminate\Support\Facades\DB;
-use App\Http\Requests\ArticlePostRequest;
 use App\Http\Requests\ArticlePutRequest;
+use App\Http\Resources\ArticleRessource;
+use App\Http\Requests\ArticlePostRequest;
+use App\Http\Resources\ArticleCollection;
+use App\Http\Resources\CategoryRessource;
+use App\Http\Resources\ProviderRessource;
 
-class ArticleController extends Controller
+class ArticleConfectionController extends Controller
 {
     use FileUploaded;
 
     public function index(Request $request)
     {
-        $perPage = $request->perPage ?? null;
-        if ($perPage) {
-            if ($request->article_data) {
-                return $this->jsonResponse("", [], [
-                    "articles" => Article::with(["category", "providers"])->orderBy("id", "desc")->paginate(intval($perPage)),
-                    "providers" => Provider::all(),
-                    "categories" => Category::all(),
-                    "approvisionnements" => Approvisionnement::all()
-                ]);
-            }
-
-            return $this->jsonResponse("", [], Article::with("category")->orderBy("id", "desc")->paginate(intval($perPage)));
+        if ($request->data) {
+            return $this->jsonResponse("", [], [
+                "providers" => ProviderRessource::collection(Provider::all()),
+                "categories" => CategoryRessource::collection(Category::byType("confection")->get())
+            ]);
         }
 
-        return $this->jsonResponse("", [], Article::with("category")->orderBy("id", "desc")->get());
+        $perPage = $request->perPage ?? null;
+        if ($perPage) {
+            return new ArticleCollection(ArticleConfection::with("category", "providers")->orderBy("id", "desc")->paginate(intval($perPage)));
+        }
+
+        return $this->jsonResponse("", [], new ArticleCollection(ArticleConfection::with("category", "providers")->orderBy("id", "desc")->get()));
     }
 
     public function show(string $id)
     {
-        $article = Article::find($id);
+        /** @var ArticleConfection $article */
+        $article = ArticleConfection::find($id);
         if (!$article) {
             return $this->jsonResponse("", ["L'article que vous chercher n'existe pas!"]);
         }
+        $article->load("category", "providers");
         return $this->jsonResponse("Article trouvée avec succès", [], [$article]);
     }
 
@@ -51,7 +55,7 @@ class ArticleController extends Controller
             return $existing;
         }
 
-        $data = $this->storeImage($request, "article");
+        $data = $this->storeImage($request, "articles_confection");
         $dataToReturn = null;
 
         DB::transaction(function () use ($data, &$dataToReturn) {
@@ -59,21 +63,22 @@ class ArticleController extends Controller
             $order = $data['order'];
             unset($data['providers'], $data['order']);
 
-            $newArticle = Article::create($data);
-            Article::afterCreated($newArticle, $providers, $order);
+            /** @var ArticleConfection $newArticle */
+            $newArticle = ArticleConfection::create($data);
+            ArticleConfection::afterCreated($newArticle, $providers, $order);
             $newArticle->load("category", "providers");
-            $dataToReturn = $this->jsonResponse("Article enregistré avec succès", [], [$newArticle]);
+            $dataToReturn = $this->jsonResponse("Article enregistré avec succès", [], [new ArticleRessource($newArticle)]);
         });
         return $dataToReturn;
     }
 
-    public function update(Article $article, ArticlePutRequest $request)
+    public function update(ArticleConfection $article, ArticlePutRequest $request)
     {
         if (!$article) {
             return $this->jsonResponse("", ["L'article que vous essayer de modifier n'existe pas"]);
         }
         
-        $data = $this->storeOrReplace($article, $request, "article");
+        $data = $this->storeOrReplace($article, $request, "articles_confection");
         if (empty($data)) {
             return $this->jsonResponse("", ["Aucune modification"]);
         }
@@ -84,16 +89,16 @@ class ArticleController extends Controller
             unset($data['providers'], $data['order']);
 
             $article->update($data);
-            Article::afterUpdated($article, $providers, $order);
+            ArticleConfection::afterUpdated($article, $providers, $order);
         });
         $article->load("category", "providers");
-        return $this->jsonResponse("Article modifié avec succès", [], [$article]);
+        return $this->jsonResponse("Article modifié avec succès", [], [new ArticleRessource($article)]);
     }
 
     public function handleExistingArticle(Request $request)
     {
-        /** @var Article $article */
-        $article = Article::withTrashed()->byLabel($request->label)->first();
+        /** @var ArticleConfection $article */
+        $article = ArticleConfection::withTrashed()->byLabel($request->label)->first();
         if (!$article) {
             return null;
         }
@@ -108,7 +113,7 @@ class ArticleController extends Controller
 
     public function searchArticle(string $label)
     {
-        $article = Article::where("label", "like", "$label")->first();
+        $article = ArticleConfection::where("label", "like", "$label")->first();
         if (!$article) {
             return $this->jsonResponse("", ["L'article que vous chercher n'existe pas"]);
         }
@@ -117,14 +122,14 @@ class ArticleController extends Controller
 
     public function destroy(string $id)
     {
-        $article = Article::where("id", $id)->first();
+        $article = ArticleConfection::where("id", $id)->first();
 
         if (!$article) {
             return $this->jsonResponse("", ["L'article que vous essayer de supprimer n'existe pas"]);
         }
 
         $destroyed = DB::transaction(function () use ($id) {
-            Article::destroy($id);
+            ArticleConfection::destroy($id);
             $approvisionnements = Approvisionnement::where("article_id", $id)->get()->pluck('article_id');
             Approvisionnement::destroy($approvisionnements);
         });

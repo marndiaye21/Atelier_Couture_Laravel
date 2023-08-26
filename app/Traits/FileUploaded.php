@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 trait FileUploaded
 {
-    function storeImage(ArticlePutRequest|ArticlePostRequest $request, string $folder)
+    function storeImage(Request $request, string $folder)
     {
         $data = $request->validate($request->rules());
         /** @var UploadedFile $image */
@@ -24,7 +24,7 @@ trait FileUploaded
         return $data;
     }
 
-    function storeOrReplace(Model $model, ArticlePutRequest|ArticlePostRequest $request, string $folder)
+    function storeOrReplace(Model $model, Request $request, string $folder)
     {
         if ($request->hasFile('photo')) {
             Storage::disk("public")->delete($model->photo);
