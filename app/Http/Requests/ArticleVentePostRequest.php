@@ -24,7 +24,7 @@ class ArticleVentePostRequest extends FormRequest
         return [
             "label" => "required|unique:articles_vente|min:3",
             "sales_price" => "required|min:0",
-            "promo" => "sometimes|required|min:0",
+            "promo" => "sometimes|min:0",
             "stock" => "sometimes|required|min:0",
             "photo" => "required|image|max:2000",
             "reference" => "required",

@@ -21,8 +21,13 @@ class ArticleRessource extends JsonResource
             "stock" => $this->stock,
             "reference" => $this->reference,
             "photo" => $this->photo,
-            "category" => new CategoryRessource($this->whenLoaded("category")),
-            "providers" => ProviderRessource::collection($this->whenLoaded("providers"))
+            "category" => new CategoryRessource($this->category),
+            "providers" => ProviderRessource::collection($this->providers),
+            "pivot" => $this->whenPivotLoaded('articles_confection_articles_vente', function () {
+                return [
+                    "article_confection_quantity" => $this->pivot->article_confection_quantity
+                ];
+            }),
         ];
     }
 }

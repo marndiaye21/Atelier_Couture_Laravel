@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string("label")->unique();
             $table->float("sales_price");
-            $table->float("promo")->default(0);
+            $table->float("promo")->nullable()->default(0);
             $table->integer("stock")->default(0);
             $table->string("photo");
             $table->string("reference");

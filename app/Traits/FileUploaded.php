@@ -13,7 +13,7 @@ trait FileUploaded
 {
     function storeImage(Request $request, string $folder)
     {
-        $data = $request->validate($request->rules());
+        $data = $request->validated();
         /** @var UploadedFile $image */
         $file = $request->hasFile('photo');
         if ($file) {
@@ -27,7 +27,7 @@ trait FileUploaded
     function storeOrReplace(Model $model, Request $request, string $folder)
     {
         if ($request->hasFile('photo')) {
-            Storage::disk("public")->delete($model->photo);
+            $model->photo ? Storage::disk("public")->delete($model->photo) : null;
         }
 
         return $this->storeImage($request, $folder);

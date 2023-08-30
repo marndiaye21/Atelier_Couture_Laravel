@@ -22,7 +22,16 @@ class ArticleVentePutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "label" => "sometimes|required|unique:articles_vente|min:3",
+            "sales_price" => "sometimes|required|min:0",
+            "promo" => "sometimes|min:0",
+            "stock" => "sometimes|required|min:0",
+            "photo" => "sometimes|required|image|max:2000",
+            "reference" => "sometimes|required",
+            "manufacturing_cost" => "sometimes|required|min:0",
+            "marge" => "sometimes|required|min:0",
+            "articles_confection" => "sometimes|required|array",
+            "category_id" => "sometimes|required|exists:categories,id",
         ];
     }
 }

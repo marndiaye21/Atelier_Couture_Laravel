@@ -7,6 +7,8 @@ use App\Http\Controllers\ProviderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+Route::put("/ventes/{articleVente}", [ArticleVenteController::class, 'updateArticle']);
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -32,6 +34,6 @@ Route::get("/providers/search/{searchValue}", [ProviderController::class, "searc
 Route::apiResource("/articles", ArticleConfectionController::class);
 Route::get("/articles/search/{searchValue}", [ArticleConfectionController::class, 'searchArticle']);
 
-Route::apiResource("/articles_vente", ArticleVenteController::class);
+Route::apiResource("/articles_vente", ArticleVenteController::class)->parameter("articles_vente", "articleVente");
 
 
